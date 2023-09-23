@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:discord_when2meet/commands/hello.dart';
 import 'package:discord_when2meet/commands/ping.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_commands/nyxx_commands.dart';
@@ -21,7 +22,10 @@ void main() async {
     ..registerPlugin(commands);
 
   // Register commands, listeners, services and setup any extra packages here
-  commands.addCommand(ping);
+  commands
+    ..addCommand(ping)
+    ..addCommand(hello)
+    ..addCommand(createEvent);
 
   await client.connect();
 }

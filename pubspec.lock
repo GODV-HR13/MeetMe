@@ -154,7 +154,7 @@ packages:
     source: hosted
     version: "5.0.2"
   nyxx_interactions:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: nyxx_interactions
       sha256: a1a07cfe4d504c50ba69b4e74160bd6aaafb855502254faa4f8b302323dd2666

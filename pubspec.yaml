@@ -9,6 +9,7 @@ environment:
 dependencies:
   nyxx: ^5.0.0
   nyxx_commands: ^5.0.0
+  nyxx_interactions: ^4.6.0
   
   
   
