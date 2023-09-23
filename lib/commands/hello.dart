@@ -15,7 +15,7 @@ final hello = ChatCommand(
     bool submitted = false;
     bool firstResponse = true;
 
-    IInteractiveContext loopContext = context;
+    IInteractionInteractiveContext loopContext = context;
 
     while (!submitted) {
       // Send the original message, or edit the latest loopContext, to be
@@ -48,7 +48,7 @@ final hello = ChatCommand(
 );
 
 Future<ComponentId> dayPicker(
-  IInteractiveContext context,
+  IInteractionInteractiveContext context,
   Map<String, List<String>> dayToTimeAvailabilities,
   InteractionChatContext originalContext,
   bool firstResponse,
@@ -109,6 +109,7 @@ Future<ComponentId> dayPicker(
     await originalContext.interactionEvent.editOriginalResponse(
       messageBuilder,
     );
+    await context.acknowledge();
   }
 
   return id;
@@ -172,5 +173,6 @@ Future<ComponentId> timePicker(
         ComponentRowBuilder()..addComponent(timeSelectBuilder..maxValues = 24)
       ],
   );
+  await selectedDayContext.acknowledge();
   return timePickerId;
 }
