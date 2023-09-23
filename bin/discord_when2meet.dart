@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:discord_when2meet/commands/hello.dart';
 import 'package:discord_when2meet/commands/ping.dart';
+import 'package:discord_when2meet/commands/createevent.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_commands/nyxx_commands.dart';
 
