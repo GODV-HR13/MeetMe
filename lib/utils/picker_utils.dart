@@ -1,22 +1,15 @@
-import 'package:nyxx/nyxx.dart';
-import 'package:nyxx_commands/nyxx_commands.dart';
 import 'package:nyxx_interactions/nyxx_interactions.dart';
-
-final hello = ChatCommand(
-  'hello',
-  'test',
-  id('hello', (InteractionChatContext context) async {}),
-);
 
 /// Presents the day picker to the user.
 ///
-/// [context] is optional. If set, will edit the original message
+/// If [selectEvent] is not null, the action stemmed from choosing times
+/// of time picker, and we're looping.
 ///
 /// If [buttonEvent] is not null, the action stemmed from clicking the
 /// initial button.
 void dayPicker(
   Map<String, List<String>> dayToTimeAvailabilities, {
-  InteractionChatContext? context,
+  IMultiselectInteractionEvent? selectEvent,
   IButtonInteractionEvent? buttonEvent,
 }) async {
   // var id = ComponentId.generate();
@@ -66,8 +59,7 @@ void dayPicker(
     await buttonEvent.sendFollowup(messageBuilder, hidden: true);
   } else {
     // TODO: We might need to pass a message ID here
-    await context!.interactionEvent.editOriginalResponse(messageBuilder);
-    await context.acknowledge();
+    await selectEvent!.respond(messageBuilder, hidden: true);
   }
 }
 
@@ -123,7 +115,8 @@ void timePicker(
       // Using .first because they can only select one
       ..content = 'Choose your availability for $selectedDay'
       ..componentRows = [
-        ComponentRowBuilder()..addComponent(timeSelectBuilder..maxValues = newMSTimes.length),
+        ComponentRowBuilder()
+          ..addComponent(timeSelectBuilder..maxValues = newMSTimes.length),
       ],
   );
 }

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:discord_when2meet/commands/create_event.dart';
-import 'package:discord_when2meet/commands/hello.dart';
+import 'package:discord_when2meet/utils/picker_utils.dart';
 import 'package:discord_when2meet/commands/ping.dart';
 import 'package:discord_when2meet/utils/image_utils.dart';
 import 'package:discord_when2meet/utils/mongo_api.dart';
@@ -33,7 +33,6 @@ void main() async {
   // Register commands, listeners, services and setup any extra packages here
   commands
     ..addCommand(ping)
-    ..addCommand(hello)
     ..addCommand(createEvent);
 
   await client.connect();
@@ -82,7 +81,6 @@ void main() async {
 
   interactions
     ..registerMultiselectHandler('time-picker', (timeSelectEvent) async {
-      timeSelectEvent.acknowledge(hidden: true);
       // Append to the map:
       // EG:
       // dayToTimeAvailabilities["sunday"] = ["0-1", "5-6", "6-7"]
@@ -108,7 +106,7 @@ void main() async {
       }
       calendar.update(dayToTimeAvailabilities);
       await MongoApi.updateCalendar(calendar);
-      ImageUtils.createCalendar(calendar, id);
+      await ImageUtils.createCalendar(calendar, id);
 
       final message = await client.httpEndpoints
           .fetchMessage(timeSelectEvent.interaction.channel.id, Snowflake(id));
@@ -120,7 +118,7 @@ void main() async {
           ..addFileAttachment(File('generated/cal_$id.png')),
       );
       
-      dayPicker(dayToTimeAvailabilities, context: );
+      dayPicker(dayToTimeAvailabilities, selectEvent: timeSelectEvent);
     })
     ..syncOnReady();
 }
