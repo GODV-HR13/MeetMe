@@ -1,4 +1,4 @@
-# MeetMe
+![](https://i.ibb.co/L66kXbB/Frame-1.png "MeetMe Logo")
 
 A Discord bot made with [Dart](https://dart.dev), [nyxx](https://pub.dev/packages/nyxx), and [nyxx_commands](https://pub.dev/packages/nyxx_commands)!
 
