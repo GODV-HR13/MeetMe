@@ -20,7 +20,7 @@ Future<void> main() async {
 }
 
 class ImageUtils {
-  static void createCalendar(FixedCalendar calendar, String messageId) async {
+  static Future<void> createCalendar(FixedCalendar calendar, String messageId) async {
     final opacity = getOpacity(calendar.totalResponses);
 
     // Decode the image file at the given path
