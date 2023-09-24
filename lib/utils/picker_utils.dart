@@ -115,7 +115,9 @@ void timePicker(
       ..content = 'Choose your availability for $selectedDay'
       ..componentRows = [
         ComponentRowBuilder()
-          ..addComponent(timeSelectBuilder..maxValues = newMSTimes.length),
+          ..addComponent(timeSelectBuilder
+            ..maxValues = newMSTimes.length
+            ..minValues = 0),
       ],
   );
 }

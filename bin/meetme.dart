@@ -20,8 +20,8 @@ void main() async {
 
   final commands = CommandsPlugin(
       prefix: (_) => '!',
-      options: CommandsOptions(type: CommandType.slashOnly));
-  // guild: Snowflake('1155188691011121232'));
+      options: CommandsOptions(type: CommandType.slashOnly),
+      guild: Snowflake('1155188691011121232'));
 
   client
     ..registerPlugin(Logging())
@@ -45,50 +45,50 @@ void main() async {
 
   interactions
     ..registerButtonHandler('add-availability', (event) async {
-      final id = event.interaction.message!.id.toString();
+      final messageId = event.interaction.message!.id.toString();
 
       /// Map of days to available times
       /// EG
       /// {"sunday": ["0-1", "5-6", "6-7"], "wednesday": ["6-7"] }
-      final dayToTimeAvailabilities = PermanenceUtils.fetchSession(id) ?? {};
+      final userId = event.interaction.userAuthor!.id.toString();
+      final dayToTimeAvailabilities =
+          PermanenceUtils.fetchSession(messageId, userId) ?? {};
 
       // Send the original message, or edit the latest loopContext, to be
       // the day picker message + submit button
       // final dayPickerId =
       dayPicker(dayToTimeAvailabilities, buttonEvent: event);
 
-      print(id);
+      print(messageId);
       // 1155314717770907720
 
-      PermanenceUtils.storeSession(
-          event.interaction.message!.id.toString(), dayToTimeAvailabilities);
+      PermanenceUtils.storeSession(dayToTimeAvailabilities,
+          messageId: messageId, userId: userId);
     })
-    ..syncOnReady();
-
-  interactions
     ..registerMultiselectHandler('day-picker', (daySelectEvent) async {
       // "What the heck happened here..."
       // Basically this is how we find the original message ID. Button response
       // messages "reply" to the original, but it's considered a cross post.
-      final id = daySelectEvent
+      final messageId = daySelectEvent
           .interaction.message!.crossPostReference!.message!.id
           .toString();
-      print(id); // 1155320435785863268
-      final dayToTimeAvailabilities = PermanenceUtils.fetchSession(id);
+      print(messageId); // 1155320435785863268
+      final userId = daySelectEvent.interaction.userAuthor!.id.toString();
+      final dayToTimeAvailabilities =
+          PermanenceUtils.fetchSession(messageId, userId);
       // final timePickerId =
       timePicker(dayToTimeAvailabilities!, event: daySelectEvent);
     })
-    ..syncOnReady();
-
-  interactions
     ..registerMultiselectHandler('time-picker', (timeSelectEvent) async {
       // Append to the map:
       // EG:
       // dayToTimeAvailabilities["sunday"] = ["0-1", "5-6", "6-7"]
-      final id = timeSelectEvent
+      final messageId = timeSelectEvent
           .interaction.message!.crossPostReference!.message!.id
           .toString();
-      final dayToTimeAvailabilities = PermanenceUtils.fetchSession(id);
+      final userId = timeSelectEvent.interaction.userAuthor!.id.toString();
+      final dayToTimeAvailabilities =
+          PermanenceUtils.fetchSession(messageId, userId);
 
       final content = timeSelectEvent.interaction.message!.content;
       final firstMatch =
@@ -99,7 +99,7 @@ void main() async {
           timeSelectEvent.interaction.values;
       print(dayToTimeAvailabilities);
 
-      final calendar = await MongoApi.fetchCalendar(id);
+      final calendar = await MongoApi.fetchCalendar(messageId);
       if (calendar == null) {
         timeSelectEvent.respond(
             MessageBuilder.content('Unable to fetch calendar from DB. Sorry!'));
@@ -108,16 +108,18 @@ void main() async {
       calendar.update(dayToTimeAvailabilities,
           timeSelectEvent.interaction.userAuthor!.id.toString());
       await MongoApi.updateCalendar(calendar);
-      await ImageUtils.createCalendar(calendar, id);
+      await ImageUtils.createCalendar(calendar, messageId);
 
-      final message = await client.httpEndpoints
-          .fetchMessage(timeSelectEvent.interaction.channel.id, Snowflake(id));
+      final message = await client.httpEndpoints.fetchMessage(
+          timeSelectEvent.interaction.channel.id, Snowflake(messageId));
       await client.httpEndpoints.editMessage(
         timeSelectEvent.interaction.channel.id,
-        Snowflake(id),
+        Snowflake(messageId),
         MessageBuilder.fromMessage(message)
-          ..embeds = [EmbedBuilder()..imageUrl = 'attachment://cal_$id.png']
-          ..addFileAttachment(File('generated/cal_$id.png')),
+          ..embeds = [
+            EmbedBuilder()..imageUrl = 'attachment://cal_$messageId.png'
+          ]
+          ..addFileAttachment(File('generated/cal_$messageId.png')),
       );
 
       dayPicker(dayToTimeAvailabilities, selectEvent: timeSelectEvent);

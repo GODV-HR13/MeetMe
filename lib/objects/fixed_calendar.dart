@@ -33,6 +33,12 @@ class FixedCalendar {
   });
 
   void update(Map<String, List<String>> dayToTimeAvailabilities, String userId) {
+    // Completely remove user from allAvailability
+    for (var o in allAvailability.values) {
+      for (var p in o.values) {
+        p.remove(userId);
+      }
+    }
     // Loop through all entries (all days)
     for (var entry in dayToTimeAvailabilities.entries) {
       final day = entry.key;
