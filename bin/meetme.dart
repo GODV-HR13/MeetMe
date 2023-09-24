@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:meetme/commands/create_event.dart';
-import 'package:meetme/commands/ping.dart';
 import 'package:meetme/utils/image_utils.dart';
 import 'package:meetme/utils/mongo_api.dart';
 import 'package:meetme/utils/permanence_utils.dart';
@@ -31,7 +30,6 @@ void main() async {
 
   // Register commands, listeners, services and setup any extra packages here
   commands
-    ..addCommand(ping)
     ..addCommand(createEvent);
 
   await client.connect();
