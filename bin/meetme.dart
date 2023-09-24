@@ -20,14 +20,13 @@ void main() async {
 
   final commands = CommandsPlugin(
       prefix: (_) => '!',
-      options: CommandsOptions(type: CommandType.slashOnly),
-      // DEBUG
-      guild: Snowflake('1155188691011121232'));
+      options: CommandsOptions(type: CommandType.slashOnly));
+  // guild: Snowflake('1155188691011121232'));
 
   client
     ..registerPlugin(Logging())
     ..registerPlugin(CliIntegration())
-    // ..registerPlugin(IgnoreExceptions())
+    ..registerPlugin(IgnoreExceptions())
     ..registerPlugin(commands);
 
   // Register commands, listeners, services and setup any extra packages here
@@ -46,17 +45,19 @@ void main() async {
 
   interactions
     ..registerButtonHandler('add-availability', (event) async {
+      final id = event.interaction.message!.id.toString();
+
       /// Map of days to available times
       /// EG
       /// {"sunday": ["0-1", "5-6", "6-7"], "wednesday": ["6-7"] }
-      Map<String, List<String>> dayToTimeAvailabilities = {};
+      final dayToTimeAvailabilities = PermanenceUtils.fetchSession(id) ?? {};
 
       // Send the original message, or edit the latest loopContext, to be
       // the day picker message + submit button
       // final dayPickerId =
       dayPicker(dayToTimeAvailabilities, buttonEvent: event);
 
-      print(event.interaction.message!.id.toString());
+      print(id);
       // 1155314717770907720
 
       PermanenceUtils.storeSession(

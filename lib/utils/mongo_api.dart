@@ -33,7 +33,6 @@ class MongoApi {
   static Future<WriteResult> updateCalendar(FixedCalendar calendar) async {
     await _ensureConnection();
     final collection = _db.collection('Calendars');
-    // TODO
     return await collection.replaceOne(
         where.eq('_id', calendar.id), calendar.toJson());
   }

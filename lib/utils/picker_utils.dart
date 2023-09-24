@@ -58,7 +58,6 @@ void dayPicker(
     await buttonEvent.acknowledge(hidden: true);
     await buttonEvent.sendFollowup(messageBuilder, hidden: true);
   } else {
-    // TODO: We might need to pass a message ID here
     await selectEvent!.respond(messageBuilder, hidden: true);
   }
 }
