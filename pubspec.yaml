@@ -1,4 +1,4 @@
-name: discord_when2meet
+name: meetme
 description: A Discord bot written with nyxx and nyxx_commands.
 version: 0.1.0
 publish_to: none

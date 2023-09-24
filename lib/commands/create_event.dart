@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:discord_when2meet/objects/fixed_calendar.dart';
-import 'package:discord_when2meet/utils/mongo_api.dart';
+import 'package:meetme/objects/fixed_calendar.dart';
+import 'package:meetme/utils/mongo_api.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_commands/nyxx_commands.dart';
 import 'package:nyxx_interactions/nyxx_interactions.dart';

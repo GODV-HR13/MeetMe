@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:discord_when2meet/objects/fixed_calendar.dart';
+import 'package:meetme/objects/fixed_calendar.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 class MongoApi {

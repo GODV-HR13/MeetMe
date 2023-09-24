@@ -1,11 +1,11 @@
 import 'dart:io';
 
-import 'package:discord_when2meet/commands/create_event.dart';
-import 'package:discord_when2meet/commands/ping.dart';
-import 'package:discord_when2meet/utils/image_utils.dart';
-import 'package:discord_when2meet/utils/mongo_api.dart';
-import 'package:discord_when2meet/utils/permanence_utils.dart';
-import 'package:discord_when2meet/utils/picker_utils.dart';
+import 'package:meetme/commands/create_event.dart';
+import 'package:meetme/commands/ping.dart';
+import 'package:meetme/utils/image_utils.dart';
+import 'package:meetme/utils/mongo_api.dart';
+import 'package:meetme/utils/permanence_utils.dart';
+import 'package:meetme/utils/picker_utils.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_commands/nyxx_commands.dart';
 import 'package:nyxx_interactions/nyxx_interactions.dart';

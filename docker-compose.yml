@@ -1,18 +1,9 @@
-version: '3.9'
+version: '3.4'
 
 services:
-  discord_when2meet:
-    build: .
-    restart: always
+  meetme:
+    container_name: meetme
+    image: ghcr.io/godv-hr13/meetme:master
+    restart: unless-stopped
     env_file:
-      .env
-
-    links: [
-      
-      
-    ]
-    depends_on: [
-      
-      
-    ]
-
+      - .env
