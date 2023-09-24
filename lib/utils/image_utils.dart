@@ -9,19 +9,29 @@ Future<void> main() async {
     'sunday': ['13-14', '12-13'],
     'tuesday': ['10-11', '9-10', '11-12'],
     'friday': ['15-16'],
-  });
+  }, '0');
   calendar.update({
     'sunday': ['13-14'],
     'tuesday': ['15-16', '16-17'],
     'thursday': ['13-14', '12-13'],
-  });
-  print(calendar.totalResponses);
+  }, '0');
   ImageUtils.createCalendar(calendar, '0');
 }
 
 class ImageUtils {
   static Future<void> createCalendar(FixedCalendar calendar, String messageId) async {
-    final opacity = getOpacity(calendar.totalResponses);
+    List<Set<String>> sets = [];
+    for (var o in calendar.allAvailability.values) {
+      for (var p in o.values) {
+        sets.add(p);
+      }
+    }
+    Set<String> merged = {};
+    for (var set in sets) {
+      merged.addAll(set);
+    }
+
+    final opacity = getOpacity(merged.length);
 
     // Decode the image file at the given path
     var command =
@@ -42,14 +52,14 @@ class ImageUtils {
       final day = entry.key;
       for (var entry2 in entry.value.entries) {
         final time = entry2.key;
-        final participants = entry2.value;
+        final participantsCount = entry2.value.length;
         
         List<String> split = time.split('-');
         int startHour = int.parse(split[0]);
         int offset = ((startHour - 9) * 38) + 36;
         
         // Stack image "participants" times
-        for (int i = 0; i < participants; i++) {
+        for (int i = 0; i < participantsCount; i++) {
           img = compositeImage(img, overlay, dstX: currentX, dstY: offset);
         }
       }

@@ -15,12 +15,9 @@ class FixedCalendar {
   /// Message ID of the event's main message
   String messageId;
 
-  /// Total number of people who have responded.
-  int totalResponses = 0;
-
-  /// EG
-  /// {'Sunday': {'1-2': 4, '2-3': 1}, 'Monday': {'4-5': 2, '5-6': 4} }
-  Map<String, Map<String, int>> allAvailability = {
+  /// Map of day ID to a map of times to a list of user IDs.
+  /// {'sunday': {'1-2': ['123', '456'], '2-3': ['123']}, 'monday': {'4-5': ['123', '456'], '5-6': ['123', '456', '789']} }
+  Map<String, Map<String, Set<String>>> allAvailability = {
     'sunday': {},
     'monday': {},
     'tuesday': {},
@@ -35,15 +32,14 @@ class FixedCalendar {
     required this.messageId,
   });
 
-  void update(Map<String, List<String>> dayToTimeAvailabilities) {
-    totalResponses++;
+  void update(Map<String, List<String>> dayToTimeAvailabilities, String userId) {
     // Loop through all entries (all days)
     for (var entry in dayToTimeAvailabilities.entries) {
       final day = entry.key;
       // Loop through all times in each day
       for (var time in entry.value) {
-        allAvailability[day]![time] ??= 0;
-        allAvailability[day]![time] = allAvailability[day]![time]! + 1;
+        allAvailability[day]![time] ??= {};
+        allAvailability[day]![time]!.add(userId);
       }
     }
   }

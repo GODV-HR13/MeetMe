@@ -1,18 +1,18 @@
 import 'dart:io';
 
 import 'package:discord_when2meet/commands/create_event.dart';
-import 'package:discord_when2meet/utils/picker_utils.dart';
 import 'package:discord_when2meet/commands/ping.dart';
 import 'package:discord_when2meet/utils/image_utils.dart';
 import 'package:discord_when2meet/utils/mongo_api.dart';
 import 'package:discord_when2meet/utils/permanence_utils.dart';
+import 'package:discord_when2meet/utils/picker_utils.dart';
 import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_commands/nyxx_commands.dart';
 import 'package:nyxx_interactions/nyxx_interactions.dart';
 
 void main() async {
   await MongoApi.connectToDb();
-  
+
   final client = NyxxFactory.createNyxxWebsocket(
     Platform.environment['TOKEN']!,
     GatewayIntents.allUnprivileged,
@@ -97,14 +97,15 @@ void main() async {
       dayToTimeAvailabilities![selectedDay!] =
           timeSelectEvent.interaction.values;
       print(dayToTimeAvailabilities);
-      
+
       final calendar = await MongoApi.fetchCalendar(id);
       if (calendar == null) {
         timeSelectEvent.respond(
             MessageBuilder.content('Unable to fetch calendar from DB. Sorry!'));
         return;
       }
-      calendar.update(dayToTimeAvailabilities);
+      calendar.update(dayToTimeAvailabilities,
+          timeSelectEvent.interaction.userAuthor!.id.toString());
       await MongoApi.updateCalendar(calendar);
       await ImageUtils.createCalendar(calendar, id);
 
@@ -117,7 +118,7 @@ void main() async {
           ..embeds = [EmbedBuilder()..imageUrl = 'attachment://cal_$id.png']
           ..addFileAttachment(File('generated/cal_$id.png')),
       );
-      
+
       dayPicker(dayToTimeAvailabilities, selectEvent: timeSelectEvent);
     })
     ..syncOnReady();
