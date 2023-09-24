@@ -28,8 +28,11 @@ doc/api/
 .flutter-plugins-dependencies
 
 # Generated files
-*.g.dart
+#*.g.dart
 *.exe
 
 # IDEA
 /.idea/
+
+# Generated calendars
+/generated
