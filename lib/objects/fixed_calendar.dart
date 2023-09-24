@@ -1,8 +1,21 @@
+import 'package:json_annotation/json_annotation.dart';
+import 'package:mongo_dart/mongo_dart.dart';
+
+part 'fixed_calendar.g.dart';
+
+@JsonSerializable()
 class FixedCalendar {
-  // Name of event.
+  /// Mongo ID of the object
+  @JsonKey(name: '_id', fromJson: idFromJson)
+  ObjectId? id;
+  
+  /// Name of event.
   String eventName;
 
-  // Total number of people who have responded.
+  /// Message ID of the event's main message
+  String messageId;
+
+  /// Total number of people who have responded.
   int totalResponses = 0;
 
   /// EG
@@ -18,7 +31,8 @@ class FixedCalendar {
   };
 
   FixedCalendar({
-    required this.eventName
+    required this.eventName,
+    required this.messageId,
   });
 
   void update(Map<String, List<String>> dayToTimeAvailabilities) {
@@ -33,6 +47,15 @@ class FixedCalendar {
       }
     }
   }
+
+  factory FixedCalendar.fromJson(Map<String, dynamic> json) =>
+      _$FixedCalendarFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FixedCalendarToJson(this);
+}
+
+ObjectId? idFromJson(ObjectId? id) {
+  return id;
 }
 
 // testing

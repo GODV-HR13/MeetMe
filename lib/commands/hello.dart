@@ -1,61 +1,25 @@
 import 'package:nyxx/nyxx.dart';
 import 'package:nyxx_commands/nyxx_commands.dart';
-import 'package:nyxx_commands/src/context/component_context.dart';
 import 'package:nyxx_interactions/nyxx_interactions.dart';
 
 final hello = ChatCommand(
   'hello',
   'test',
-  id('hello', (InteractionChatContext context) async {
-    /// Map of days to available times
-    /// EG
-    /// {"sunday": ["0-1", "5-6", "6-7"], "wednesday": ["6-7"] }
-    Map<String, List<String>> dayToTimeAvailabilities = {};
-
-    bool submitted = false;
-    bool firstResponse = true;
-
-    IInteractionInteractiveContext loopContext = context;
-
-    while (!submitted) {
-      // Send the original message, or edit the latest loopContext, to be
-      // the day picker message + submit button
-      final dayPickerId = await dayPicker(
-          loopContext, dayToTimeAvailabilities, context, firstResponse);
-      firstResponse = false;
-
-      // after day multiselect is run, select the time
-      MultiselectComponentContext<String> selectedDayContext =
-          await context.awaitSelection(dayPickerId);
-
-      final timePickerId = await timePicker(selectedDayContext,
-          dayToTimeAvailabilities, selectedDayContext.selected, context);
-
-      // Wait for user to select availability times.
-      MultiselectComponentContext<List<String>> selectedTimeContext =
-          await selectedDayContext.awaitMultiSelection(timePickerId);
-
-      // Append to the map:
-      // EG:
-      // dayToTimeAvailabilities["sunday"] = ["0-1", "5-6", "6-7"]
-      dayToTimeAvailabilities[selectedDayContext.selected] =
-          selectedTimeContext.selected;
-      print(dayToTimeAvailabilities);
-
-      loopContext = selectedTimeContext;
-    }
-  }),
+  id('hello', (InteractionChatContext context) async {}),
 );
 
-Future<ComponentId> dayPicker(
-  IInteractionInteractiveContext context,
-  Map<String, List<String>> dayToTimeAvailabilities,
-  InteractionChatContext originalContext,
-  bool firstResponse,
-) async {
-  final embedBuilder = EmbedBuilder()..title = '[EVENT NAME]';
-
-  var id = ComponentId.generate();
+/// Presents the day picker to the user.
+///
+/// [context] is optional. If set, will edit the original message
+///
+/// If [buttonEvent] is not null, the action stemmed from clicking the
+/// initial button.
+void dayPicker(
+  Map<String, List<String>> dayToTimeAvailabilities, {
+  InteractionChatContext? context,
+  IButtonInteractionEvent? buttonEvent,
+}) async {
+  // var id = ComponentId.generate();
 
   Map<String, String> multiselectDays = {
     'Sunday': 'sunday',
@@ -78,14 +42,13 @@ Future<ComponentId> dayPicker(
   }
 
   final multiselectBuilder = MultiselectBuilder(
-    id.toString(),
+    'day-picker',
     // Map newMSDays into MultiselectOptionBuilders
     newMSDays.entries.map((e) => MultiselectOptionBuilder(e.key, e.value)),
   );
 
   // sends message with embed and components
   final messageBuilder = ComponentMessageBuilder()
-    ..embeds = [embedBuilder]
     ..componentRows = [
       // a multiselect component
       ComponentRowBuilder()..addComponent(multiselectBuilder),
@@ -98,30 +61,21 @@ Future<ComponentId> dayPicker(
 
   // Send the original message if it doesn't yet exist—otherwise edit the
   // ephemeral one.
-  if (firstResponse) {
-    await originalContext.respond(messageBuilder,
-        level: ResponseLevel(
-            hideInteraction: true,
-            isDm: false,
-            mention: false,
-            preserveComponentMessages: false));
+  if (buttonEvent != null) {
+    await buttonEvent.acknowledge(hidden: true);
+    await buttonEvent.sendFollowup(messageBuilder, hidden: true);
   } else {
-    await originalContext.interactionEvent.editOriginalResponse(
-      messageBuilder,
-    );
+    // TODO: We might need to pass a message ID here
+    await context!.interactionEvent.editOriginalResponse(messageBuilder);
     await context.acknowledge();
   }
-
-  return id;
 }
 
-Future<ComponentId> timePicker(
-  MultiselectComponentContext<String> selectedDayContext,
-  Map<String, List<String>> dayToTimeAvailabilities,
-  String dayId,
-  InteractionChatContext originalContext,
-) async {
-  final timePickerId = ComponentId.generate();
+void timePicker(
+  Map<String, List<String>> dayToTimeAvailabilities, {
+  required IMultiselectInteractionEvent event,
+}) async {
+  final selectedDay = event.interaction.values.first;
 
   Map<String, String> multiselectTimes = {
     // 'Midnight to 1 AM': '0-1',
@@ -155,24 +109,21 @@ Future<ComponentId> timePicker(
   for (var entry in multiselectTimes.entries) {
     // If dayToTimeAvailabilities[dayId] exists and has the current looped time
     // in it, then preselect it.
-    final shouldPreselect = dayToTimeAvailabilities[dayId] != null &&
-        dayToTimeAvailabilities[dayId]!.contains(entry.value);
+    final shouldPreselect = dayToTimeAvailabilities[selectedDay] != null &&
+        dayToTimeAvailabilities[selectedDay]!.contains(entry.value);
     newMSTimes
         .add(MultiselectOptionBuilder(entry.key, entry.value, shouldPreselect));
   }
 
-  final timeSelectBuilder =
-      MultiselectBuilder(timePickerId.toString(), newMSTimes);
+  final timeSelectBuilder = MultiselectBuilder('time-picker', newMSTimes);
 
   // sends message with embed and components
-  await originalContext.interactionEvent.editOriginalResponse(
+  await event.respond(
     ComponentMessageBuilder()
-      ..content = 'Choose your availability for ${selectedDayContext.selected}'
-      ..embeds = []
+      // Using .first because they can only select one
+      ..content = 'Choose your availability for $selectedDay'
       ..componentRows = [
-        ComponentRowBuilder()..addComponent(timeSelectBuilder..maxValues = 24),
+        ComponentRowBuilder()..addComponent(timeSelectBuilder..maxValues = newMSTimes.length),
       ],
   );
-  await selectedDayContext.acknowledge();
-  return timePickerId;
 }

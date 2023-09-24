@@ -4,7 +4,7 @@ import 'package:discord_when2meet/objects/fixed_calendar.dart';
 import 'package:image/image.dart';
 
 Future<void> main() async {
-  var calendar = FixedCalendar(eventName: 'Event');
+  var calendar = FixedCalendar(eventName: 'Event', messageId: '0');
   calendar.update({
     'sunday': ['13-14', '12-13'],
     'tuesday': ['10-11', '9-10', '11-12'],
@@ -16,11 +16,11 @@ Future<void> main() async {
     'thursday': ['13-14', '12-13'],
   });
   print(calendar.totalResponses);
-  ImageUtils().createCalendar(calendar);
+  ImageUtils.createCalendar(calendar, '0');
 }
 
 class ImageUtils {
-  void createCalendar(FixedCalendar calendar) async {
+  static void createCalendar(FixedCalendar calendar, String messageId) async {
     final opacity = getOpacity(calendar.totalResponses);
 
     // Decode the image file at the given path
@@ -59,12 +59,13 @@ class ImageUtils {
     // Encode the resulting image to the PNG image format.
     final png = encodePng(img);
     // Write the PNG formatted data to a file.
-    await File('image.png').writeAsBytes(png);
+    await Directory('generated').create();
+    await File('generated/cal_$messageId.png').writeAsBytes(png);
   }
   
   /// Given a total number of people, fetch the opacity needed for each
   /// blurple sheet.
-  double getOpacity(int total) {
+  static double getOpacity(int total) {
     return 1 / total;
   }
 }
