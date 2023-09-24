@@ -29,8 +29,7 @@ void main() async {
     ..registerPlugin(commands);
 
   // Register commands, listeners, services and setup any extra packages here
-  commands
-    ..addCommand(createEvent);
+  commands..addCommand(createEvent);
 
   await client.connect();
 
@@ -115,7 +114,9 @@ void main() async {
         Snowflake(messageId),
         MessageBuilder.fromMessage(message)
           ..embeds = [
-            EmbedBuilder()..imageUrl = 'attachment://cal_$messageId.png'
+            EmbedBuilder()
+              ..title = message.embeds.first.title
+              ..imageUrl = 'attachment://cal_$messageId.png'
           ]
           ..addFileAttachment(File('generated/cal_$messageId.png')),
       );

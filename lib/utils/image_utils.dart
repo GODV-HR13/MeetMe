@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:meetme/objects/fixed_calendar.dart';
 import 'package:image/image.dart';
+import 'package:meetme/objects/fixed_calendar.dart';
 
 Future<void> main() async {
   var calendar = FixedCalendar(eventName: 'Event', messageId: '0');
@@ -19,7 +19,8 @@ Future<void> main() async {
 }
 
 class ImageUtils {
-  static Future<void> createCalendar(FixedCalendar calendar, String messageId) async {
+  static Future<void> createCalendar(
+      FixedCalendar calendar, String messageId) async {
     List<Set<String>> sets = [];
     for (var o in calendar.allAvailability.values) {
       for (var p in o.values) {
@@ -35,31 +36,40 @@ class ImageUtils {
 
     // Decode the image file at the given path
     var command =
-    await (Command()..decodeImageFile('assets/schedule.png')).execute();
+        await (Command()..decodeImageFile('assets/schedule.png')).execute();
     var command2 = await (Command()
-      ..decodeImageFile('assets/overlay.png')
-      ..colorOffset(alpha: (opacity - 1) * 255))
+          ..decodeImageFile('assets/overlay.png')
+          ..colorOffset(alpha: (opacity - 1) * 150))
         .execute();
 
     final schedule = command.outputImage!;
     final overlay = command2.outputImage!;
 
     var img = schedule;
-    
+
     // 69 and 36 are the offsets before the first 9 AM square on Monday.
     int currentX = 69;
     for (var entry in calendar.allAvailability.entries) {
-      final day = entry.key;
+      // final day = entry.key;
       for (var entry2 in entry.value.entries) {
         final time = entry2.key;
-        final participantsCount = entry2.value.length;
-        
+        final participants = entry2.value;
+
         List<String> split = time.split('-');
         int startHour = int.parse(split[0]);
         int offset = ((startHour - 9) * 38) + 36;
-        
+
         // Stack image "participants" times
-        for (int i = 0; i < participantsCount; i++) {
+        for (String _ in participants) {
+          // final coloredOverlay = (await (Command()
+          //           ..decodeImageFile('assets/overlay.png')
+          //           ..colorOffset(
+          //               alpha: (opacity - 1) * 150,
+          //               red: int.parse(participant) % 150,
+          //               green: int.parse(participant) ~/ 20 % 150,
+          //               blue: int.parse(participant) ~/ 30 % 150))
+          //         .execute())
+          //     .outputImage;
           img = compositeImage(img, overlay, dstX: currentX, dstY: offset);
         }
       }
@@ -72,7 +82,7 @@ class ImageUtils {
     await Directory('generated').create();
     await File('generated/cal_$messageId.png').writeAsBytes(png);
   }
-  
+
   /// Given a total number of people, fetch the opacity needed for each
   /// blurple sheet.
   static double getOpacity(int total) {
