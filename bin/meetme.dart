@@ -20,7 +20,7 @@ void main() async {
   final commands = CommandsPlugin(
       prefix: (_) => '!',
       options: CommandsOptions(type: CommandType.slashOnly));
-      // guild: Snowflake('1155188691011121232'));
+  // guild: Snowflake('1155188691011121232'));
 
   client
     ..registerPlugin(Logging())
@@ -36,9 +36,7 @@ void main() async {
   final interactions =
       IInteractions.create(WebsocketInteractionBackend(client));
 
-  print((await interactions
-      .fetchGuildCommands(Snowflake('1155188691011121232'))
-      .toList()));
+  print((await interactions.fetchGlobalCommands().toList()));
 
   interactions
     ..registerButtonHandler('add-availability', (event) async {
@@ -123,5 +121,5 @@ void main() async {
 
       dayPicker(dayToTimeAvailabilities, selectEvent: timeSelectEvent);
     })
-    ..syncOnReady();
+    ..syncOnReady(syncRule: ManualCommandSync(sync: false));
 }
