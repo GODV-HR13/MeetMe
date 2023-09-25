@@ -19,8 +19,8 @@ void main() async {
 
   final commands = CommandsPlugin(
       prefix: (_) => '!',
-      options: CommandsOptions(type: CommandType.slashOnly),
-      guild: Snowflake('1155188691011121232'));
+      options: CommandsOptions(type: CommandType.slashOnly));
+      // guild: Snowflake('1155188691011121232'));
 
   client
     ..registerPlugin(Logging())
